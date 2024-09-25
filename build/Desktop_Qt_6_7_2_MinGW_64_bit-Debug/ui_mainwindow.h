@@ -12,6 +12,7 @@
 #include <QtCharts/QChartView>
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QMainWindow>
 #include <QtWidgets/QMenuBar>
 #include <QtWidgets/QPushButton>
@@ -25,10 +26,13 @@ class Ui_MainWindow
 {
 public:
     QWidget *centralwidget;
-    QPushButton *btnLoadWav;
     QWidget *verticalLayoutWidget;
     QVBoxLayout *verticalLayout;
     QChartView *chartView;
+    QWidget *horizontalLayoutWidget;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *pushButton;
+    QPushButton *btnLoadWav;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -36,12 +40,9 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(800, 600);
+        MainWindow->resize(800, 615);
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
-        btnLoadWav = new QPushButton(centralwidget);
-        btnLoadWav->setObjectName("btnLoadWav");
-        btnLoadWav->setGeometry(QRect(640, 510, 83, 29));
         verticalLayoutWidget = new QWidget(centralwidget);
         verticalLayoutWidget->setObjectName("verticalLayoutWidget");
         verticalLayoutWidget->setGeometry(QRect(60, 30, 671, 471));
@@ -52,6 +53,22 @@ public:
         chartView->setObjectName("chartView");
 
         verticalLayout->addWidget(chartView);
+
+        horizontalLayoutWidget = new QWidget(centralwidget);
+        horizontalLayoutWidget->setObjectName("horizontalLayoutWidget");
+        horizontalLayoutWidget->setGeometry(QRect(560, 500, 172, 80));
+        horizontalLayout = new QHBoxLayout(horizontalLayoutWidget);
+        horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        pushButton = new QPushButton(horizontalLayoutWidget);
+        pushButton->setObjectName("pushButton");
+
+        horizontalLayout->addWidget(pushButton);
+
+        btnLoadWav = new QPushButton(horizontalLayoutWidget);
+        btnLoadWav->setObjectName("btnLoadWav");
+
+        horizontalLayout->addWidget(btnLoadWav);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -70,6 +87,7 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
+        pushButton->setText(QCoreApplication::translate("MainWindow", "Lire Audio", nullptr));
         btnLoadWav->setText(QCoreApplication::translate("MainWindow", "Ouvrir", nullptr));
     } // retranslateUi
 

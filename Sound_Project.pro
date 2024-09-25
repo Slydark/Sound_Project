@@ -12,6 +12,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     wavdft.cpp \
+    wavfft.cpp \
     wavheader.cpp \
     wavreader.cpp \
     wavwriter.cpp
@@ -19,11 +20,13 @@ SOURCES += \
 HEADERS += \
     mainwindow.h \
     wavdft.h \
+    wavfft.h \
     wavheader.h \
     wavreader.h \
     wavwriter.h
 
 FORMS += \
+    PlayerWindow.ui \
     mainwindow.ui
 
 # Default rules for deployment.

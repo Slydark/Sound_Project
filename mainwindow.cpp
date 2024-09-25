@@ -49,7 +49,7 @@ void MainWindow::plotDFT(const std::vector<double>& frequencies, const std::vect
     series->clear();
 
     // Pour des raisons de performance, limiter le nombre de points affichés
-    const int maxPoints = 1000;
+    const int maxPoints = 500;
     int step = std::max(1, static_cast<int>(frequencies.size() / maxPoints));
 
     for (size_t i = 0; i < frequencies.size(); i += step) {
@@ -62,23 +62,68 @@ void MainWindow::plotDFT(const std::vector<double>& frequencies, const std::vect
         double maxMag = *std::max_element(magnitudes.begin(), magnitudes.end());
         axisY->setRange(0, maxMag * 1.1); // Ajouter 10% de marge
     }
+
+
+    // series->clear();
+    // const int maxPoints = 500;
+    // int step = std::max(1, static_cast<int>(frequencies.size() / maxPoints));
+
+    // for (size_t i = 0; i < frequencies.size(); i += step) {
+    //     // Utiliser le logarithme pour améliorer la visibilité
+    //     double magnitude = magnitudes[i] > 0 ? 20 * log10(magnitudes[i]) : 0;
+    //     series->append(frequencies[i], magnitude);
+    // }
+
+    // // Ajuster les axes
+    // if (!frequencies.empty() && !magnitudes.empty()) {
+    //     axisX->setRange(0, frequencies.back());
+    //     double maxMag = *std::max_element(magnitudes.begin(), magnitudes.end());
+    //     axisY->setRange(0, maxMag * 1.1); // Ajouter 10% de marge
+    // }
+
+    // for (size_t i = 0; i < frequencies.size(); i += step) {
+    //     qDebug() << "Frequency:" << frequencies[i] << "Magnitude:" << magnitudes[i];
+    // }
+
 }
+
+// void MainWindow::on_btnLoadWav_clicked()
+// {
+//     QString filePath = QFileDialog::getOpenFileName(this, tr("Open WAV File"), "", tr("WAV Files (*.wav)"));
+//     if (filePath.isEmpty()) {
+//         return;
+//     }
+
+//     WavReader reader(filePath.toStdString());
+//     if (!reader.read()) {
+//         QMessageBox::critical(this, tr("Error"), tr("Failed to read WAV file."));
+//         return;
+//     }
+
+//     //reader.displayHeaderInfo();
+
+//     dft.computeDFT(reader.getAudioData(), reader.getHeader().sampleRate);
+//     plotDFT(dft.getFrequencies(), dft.getMagnitudes());
+// }
 
 void MainWindow::on_btnLoadWav_clicked()
 {
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open WAV File"), "", tr("WAV Files (*.wav)"));
     if (filePath.isEmpty()) {
+        qDebug() << "No file selected.";
         return;
     }
 
-    WavReader reader(filePath.toStdString());
-    if (!reader.read()) {
-        QMessageBox::critical(this, tr("Error"), tr("Failed to read WAV file."));
-        return;
-    }
+    qDebug() << "Selected WAV file:" << filePath;
 
-    reader.displayHeaderInfo();
+    WavFFT fft;
+    // if (!fft.computeFFT(filePath.toStdString())) {
+    //     QMessageBox::critical(this, tr("Error"), tr("Failed to read WAV file or perform FFT."));
+    //     return;
+    // }
 
-    dft.computeDFT(reader.getAudioData(), reader.getHeader().sampleRate);
-    plotDFT(dft.getFrequencies(), dft.getMagnitudes());
+    qDebug() << "FFT computed successfully.";
+    plotDFT(fft.getFrequencies(), fft.getMagnitudes());
 }
+
+

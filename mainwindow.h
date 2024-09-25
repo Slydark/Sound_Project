@@ -5,6 +5,7 @@
 #include <QtCharts>
 #include "wavreader.h"
 #include "wavdft.h"
+#include "wavfft.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -27,6 +28,7 @@ class MainWindow : public QMainWindow
     private:
         Ui::MainWindow *ui;
         WavDFT dft;
+        WavFFT fft;
         QChart *chart;
         QLineSeries *series;
         QValueAxis *axisX;
