@@ -109,21 +109,47 @@ void MainWindow::plotDFT(const std::vector<double>& frequencies, const std::vect
 void MainWindow::on_btnLoadWav_clicked()
 {
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open WAV File"), "", tr("WAV Files (*.wav)"));
-    if (filePath.isEmpty()) {
+    if(filePath.isEmpty()) 
+    {
         qDebug() << "No file selected.";
         return;
     }
 
     qDebug() << "Selected WAV file:" << filePath;
 
+    const char* filePathChar= filePath.toStdString().c_str();
+
     WavFFT fft;
     // if (!fft.computeFFT(filePath.toStdString())) {
     //     QMessageBox::critical(this, tr("Error"), tr("Failed to read WAV file or perform FFT."));
     //     return;
     // }
+    WavHeader header;
+    int sampleRate = (int) header.sampleRate;
+    int bitsPerSample = (int) header.bitsPerSample;
+    std::vector<double> samples = fft.readWavFile(filePathChar, sampleRate, bitsPerSample);
+    
+    int m = 1;
+    while((1 << m) < header.bitsPerSample)
+    {
+        m++;
+    }
+    
+    int n = 1 << m;
+
+    double *real = new double[n];
+    double *imag = new double[n];
+
+    fft.prepareFFTData(samples, real, imag, n);
+
+    fft.FFT(1, m, real, imag);
 
     qDebug() << "FFT computed successfully.";
-    plotDFT(fft.getFrequencies(), fft.getMagnitudes());
+    // plotDFT(fft.getFrequencies(), fft.getMagnitudes());
+    fft.printFFTMagnitude(real, imag, n);
+
+    delete[] real;
+    delete[] imag;
 }
 
 

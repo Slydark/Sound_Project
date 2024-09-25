@@ -1,10 +1,11 @@
 #include "WavHeader.h"
+#include <QDebug>
 
 void WavHeader::display()
 {
-    std::cout << "Sample Rate: " << sampleRate << " Hz" << "\n";
-    std::cout << "Number of Channels: " << numChannels << "\n";
-    std::cout << "Bits Per Sample: " << bitsPerSample << "\n";
+    qDebug() << "Sample Rate: " << sampleRate << " Hz" << "\n";
+    qDebug() << "Number of Channels: " << numChannels << "\n";
+    qDebug() << "Bits Per Sample: " << bitsPerSample << "\n";
 }
 
 double WavHeader::getDuration()

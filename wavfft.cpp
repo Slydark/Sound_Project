@@ -20,7 +20,7 @@ std::vector<double> WavFFT::readWavFile(const char *filename, int &sampleRate, i
     file.read(reinterpret_cast<char*>(&header), sizeof(WavHeader));
 
     // Vérification de l'en-tête WAV
-    if(std::string(header.format, 4) != "RIFF" || std::string(header.subchunk1ID, 4) != "WAVE")
+    if(std::string(header.format, 4) != "RIFF" || std::string(header.chunkSize, 4) != "WAVE")
     {
         qDebug() << "Invalid WAV file format !";
         exit(1);
@@ -169,8 +169,17 @@ void WavFFT::printFFTMagnitude(double *real, double *imag, int n)
     for(int i = 0; i < 10; i++)
     {
         double magnitude = sqrt(real[i] * real[i] + imag[i] * imag[i]);
+        qDebug() << "Magnitude = " << magnitude;
     }
 }
+
+// const std::vector<double>& WavFFT::getFrequencies() const {
+//     return frequencies;
+// }
+
+// const std::vector<double>& WavFFT::getMagnitudes() const {
+//     return magnitudes;
+// }
 
 // WavFFT::WavFFT() : sampleRate(0), numSamples(0) {}
 
