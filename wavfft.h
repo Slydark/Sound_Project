@@ -11,6 +11,7 @@ class WavFFT
         void prepareFFTData(const std::vector<double> &sample, double *real, double *imag, int n);
         int FFT(int dir, int m, double *x, double *y);
         void printFFTMagnitude(double *real, double *imag, int n);
+
 // public:
 //     WavFFT();
 

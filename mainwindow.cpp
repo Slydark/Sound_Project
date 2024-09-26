@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
+#include <fstream>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setupChart();
+
 }
 
 MainWindow::~MainWindow()
@@ -26,14 +28,14 @@ void MainWindow::setupChart()
     chart->setTitle("DFT du fichier WAV");
 
     axisX = new QValueAxis;
-    axisX->setTitleText("Fréquencey (Hz)");
+    axisX->setTitleText("Fréquence (Hz)");
     axisX->setLabelFormat("%.1f");
     axisX->setTickCount(10);
 
     axisY = new QValueAxis;
     axisY->setTitleText("Amplitude");
     axisY->setLabelFormat("%.1f");
-    axisY->setTickCount(10);
+    axisY->setTickCount(0.001);
 
     chart->addAxis(axisX, Qt::AlignBottom);
     chart->addAxis(axisY, Qt::AlignLeft);
@@ -42,74 +44,64 @@ void MainWindow::setupChart()
 
     ui->chartView->setChart(chart);
     ui->chartView->setRenderHint(QPainter::Antialiasing);
+
+    ui->chartView->setVisible(true);
 }
 
 void MainWindow::plotDFT(const std::vector<double>& frequencies, const std::vector<double>& magnitudes)
 {
-    series->clear();
+    std::fstream CSVFile;
+    // Open or create a new csv
+    remove("CSVData.csv");
+    CSVFile.open("CSVData.csv", std::ios::app);
 
-    // Pour des raisons de performance, limiter le nombre de points affichés
+    series->clear();
     const int maxPoints = 500;
     int step = std::max(1, static_cast<int>(frequencies.size() / maxPoints));
 
     for (size_t i = 0; i < frequencies.size(); i += step) {
-        series->append(frequencies[i], magnitudes[i]);
+        double magnitude = magnitudes[i] > 0 ? 20 * log10(magnitudes[i]) : 0;
+        series->append(frequencies[i], magnitude);
     }
 
-    // Ajuster les axes
     if (!frequencies.empty() && !magnitudes.empty()) {
         axisX->setRange(0, frequencies.back());
         double maxMag = *std::max_element(magnitudes.begin(), magnitudes.end());
-        axisY->setRange(0, maxMag * 1.1); // Ajouter 10% de marge
+        axisY->setRange(0, maxMag * 1.1);
     }
 
-
-    // series->clear();
-    // const int maxPoints = 500;
-    // int step = std::max(1, static_cast<int>(frequencies.size() / maxPoints));
-
-    // for (size_t i = 0; i < frequencies.size(); i += step) {
-    //     // Utiliser le logarithme pour améliorer la visibilité
-    //     double magnitude = magnitudes[i] > 0 ? 20 * log10(magnitudes[i]) : 0;
-    //     series->append(frequencies[i], magnitude);
-    // }
-
-    // // Ajuster les axes
-    // if (!frequencies.empty() && !magnitudes.empty()) {
-    //     axisX->setRange(0, frequencies.back());
-    //     double maxMag = *std::max_element(magnitudes.begin(), magnitudes.end());
-    //     axisY->setRange(0, maxMag * 1.1); // Ajouter 10% de marge
-    // }
-
-    // for (size_t i = 0; i < frequencies.size(); i += step) {
-    //     qDebug() << "Frequency:" << frequencies[i] << "Magnitude:" << magnitudes[i];
-    // }
-
+    for (size_t i = 0; i < frequencies.size(); i += step) {
+        // Save a CSV File
+        CSVFile << frequencies[i] << ", " << magnitudes[i] << "\n";
+        // qDebug() << "Frequency:" << frequencies[i] << "Magnitude:" << magnitudes[i];
+    }
 }
 
-// void MainWindow::on_btnLoadWav_clicked()
+// void MainWindow::plotDFT(const std::vector<double>& frequencies, const std::vector<double>& magnitudes)
 // {
-//     QString filePath = QFileDialog::getOpenFileName(this, tr("Open WAV File"), "", tr("WAV Files (*.wav)"));
-//     if (filePath.isEmpty()) {
-//         return;
+//     qDebug() << "Plotting DFT...";
+//     series->clear();
+//     const int maxPoints = 500;
+//     int step = std::max(1, static_cast<int>(frequencies.size() / maxPoints));
+
+//     for (size_t i = 0; i < frequencies.size(); i += step) {
+//         double magnitude = magnitudes[i] > 0 ? 20 * log10(magnitudes[i]) : 0;
+//         series->append(frequencies[i], magnitude);
 //     }
 
-//     WavReader reader(filePath.toStdString());
-//     if (!reader.read()) {
-//         QMessageBox::critical(this, tr("Error"), tr("Failed to read WAV file."));
-//         return;
+//     if (!frequencies.empty() && !magnitudes.empty()) {
+//         axisX->setRange(0, frequencies.back());
+//         double maxMag = *std::max_element(magnitudes.begin(), magnitudes.end());
+//         axisY->setRange(0, maxMag * 1.1);
 //     }
 
-//     //reader.displayHeaderInfo();
-
-//     dft.computeDFT(reader.getAudioData(), reader.getHeader().sampleRate);
-//     plotDFT(dft.getFrequencies(), dft.getMagnitudes());
+//     qDebug() << "DFT plotted successfully.";
 // }
 
 void MainWindow::on_btnLoadWav_clicked()
 {
     QString filePath = QFileDialog::getOpenFileName(this, tr("Open WAV File"), "", tr("WAV Files (*.wav)"));
-    if(filePath.isEmpty()) 
+    if(filePath.isEmpty())
     {
         qDebug() << "No file selected.";
         return;
@@ -117,36 +109,34 @@ void MainWindow::on_btnLoadWav_clicked()
 
     qDebug() << "Selected WAV file:" << filePath;
 
-    const char* filePathChar= filePath.toStdString().c_str();
+    const char* filePathChar = filePath.toStdString().c_str();
 
     WavFFT fft;
-    // if (!fft.computeFFT(filePath.toStdString())) {
-    //     QMessageBox::critical(this, tr("Error"), tr("Failed to read WAV file or perform FFT."));
-    //     return;
-    // }
-    WavHeader header;
-    int sampleRate = (int) header.sampleRate;
-    int bitsPerSample = (int) header.bitsPerSample;
-    std::vector<double> samples = fft.readWavFile(filePathChar, sampleRate, bitsPerSample);
-    
-    int m = 1;
-    while((1 << m) < header.bitsPerSample)
-    {
-        m++;
-    }
-    
+    int sampleRate, numSample;
+    std::vector<double> samples = fft.readWavFile(filePathChar, sampleRate, numSample);
+
+    int m = static_cast<int>(std::log2(numSample));
     int n = 1 << m;
 
     double *real = new double[n];
     double *imag = new double[n];
 
     fft.prepareFFTData(samples, real, imag, n);
-
     fft.FFT(1, m, real, imag);
 
     qDebug() << "FFT computed successfully.";
-    // plotDFT(fft.getFrequencies(), fft.getMagnitudes());
-    fft.printFFTMagnitude(real, imag, n);
+
+    std::vector<double> frequencies(n), magnitudes(n);
+    for (int i = 0; i < n; ++i) {
+        frequencies[i] = i * sampleRate / n;
+        magnitudes[i] = std::sqrt(real[i] * real[i] + imag[i] * imag[i]);
+    }
+
+    // Convertir les tableaux en vecteurs
+    std::vector<double> realVec(real, real + n);
+    std::vector<double> imagVec(imag, imag + n);
+
+    plotDFT(frequencies, magnitudes);
 
     delete[] real;
     delete[] imag;
