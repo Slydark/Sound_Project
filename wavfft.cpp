@@ -163,21 +163,3 @@ int WavFFT::FFT(int dir, int m, double *x, double *y)
 
     return(1);
 }
-
-void WavFFT::printFFTMagnitude(double *real, double *imag, int n)
-{
-    for(int i = 0; i < 10; i++)
-    {
-        double magnitude = sqrt(real[i] * real[i] + imag[i] * imag[i]);
-        qDebug() << "Magnitude = " << magnitude;
-    }
-}
-
-// const std::vector<double>& WavFFT::getFrequencies() const {
-//     return frequencies;
-// }
-
-// const std::vector<double>& WavFFT::getMagnitudes() const {
-//     return magnitudes;
-// }
-

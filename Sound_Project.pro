@@ -1,6 +1,6 @@
 QT       += core gui charts
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 CONFIG += c++17
 
@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
+    qcustomplot.cpp \
     wavdft.cpp \
     wavfft.cpp \
     wavheader.cpp \
@@ -19,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     mainwindow.h \
+    qcustomplot.h \
     wavdft.h \
     wavfft.h \
     wavheader.h \
@@ -28,6 +30,8 @@ HEADERS += \
 FORMS += \
     PlayerWindow.ui \
     mainwindow.ui
+
+QMAKE_CXXFLAGS += -Wa,-mbig-obj
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

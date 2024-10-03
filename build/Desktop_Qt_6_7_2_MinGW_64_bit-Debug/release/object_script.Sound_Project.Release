@@ -1,0 +1,10 @@
+release/main.o
+release/mainwindow.o
+release/qcustomplot.o
+release/wavdft.o
+release/wavfft.o
+release/wavheader.o
+release/wavreader.o
+release/wavwriter.o
+release/moc_mainwindow.o
+release/moc_qcustomplot.o
